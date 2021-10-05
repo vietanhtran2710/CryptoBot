@@ -4,12 +4,12 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from webserver import keep_alive
+from price import Price
 
 keep_alive()
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix='!')
 
@@ -17,6 +17,13 @@ bot = commands.Bot(command_prefix='!')
 async def introduce(ctx):
     response = "Chuyên gia đọc lệnh, thần tỉa nến, thánh all in"
     await ctx.send(response)
+
+@bot.command(name='price', help="Get a coin price")
+async def get_price(ctx, symbol: str):
+  price = Price()
+  usd = price.get_price(symbol)
+  response = "1 " + symbol + " = " + usd + " USD"
+  await ctx.send(response)
 
 @bot.event
 async def on_ready():
