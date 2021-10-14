@@ -20,3 +20,17 @@ class Price(object):
           return item['price']
     except (ConnectionError, Timeout, TooManyRedirects) as e:
       print(e)
+
+  def get_multiple_price(self, src, dst):
+    try:
+      response = self.session.get(self.url)
+      data = json.loads(response.text)
+      src_price, dst_price = None, None
+      for item in data:
+        if item['currency'] == src:
+          src_price = item['price']
+        if item['currency'] == dst:
+          dst_price = item['price']
+      return src_price, dst_price
+    except (ConnectionError, Timeout, TooManyRedirects) as e:
+      print(e)
