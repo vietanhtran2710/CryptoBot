@@ -18,25 +18,27 @@ async def introduce(ctx):
     response = "Chuyên gia đọc lệnh, thần tỉa nến, thánh all in"
     await ctx.send(response)
 
-@bot.command(name='price', help="Get a coin price")
-async def get_price(ctx, symbol: str):
-  print(symbol)
-  if symbol.startswith("<@"):
-    response = symbol + " là vô giá!"
+@bot.command(name='price', help="Get a coin price. !price <symbol> <target currency-optional-default:USD>.\nEx: !price BTC, !price BTC VND")
+async def get_price(ctx, *args):
+  if not args:
+    response = "Vui lòng nhập ký hiệu đồng tiền và giá đích, !price <symbol> <target currency"
     await ctx.send(response)
   else:
-    price = Price()
-    usd = price.get_price(symbol)
-    response = "1 " + symbol + " = " + usd + " USD"
-    await ctx.send(response)
-
+    symbol = args[0].lower()
+    if symbol.startswith("<@"):
+      response = symbol + " là vô giá!"
+      await ctx.send(response)
+    else:
+      target = args[1].lower() if len(args) >= 2 else "vnd"
+      result = price.get_price(symbol, target)
+      await ctx.send(result)
+  
 @bot.command(name="swap", help="Check cryptocurrencies exchange rate")
 async def swap(ctx, src, dst, amount=1):
   if src.startswith("<@") or dst.startswith("<@"):
     response = src + " là vô giá!, không thể đổi" if src.startswith("<@") else dst + " là vô giá!, không thể đổi"
     await ctx.send(response)
   else:
-    price = Price()
     src_price, dst_price = price.get_multiple_price(src, dst)
     if src_price is None:
       await ctx.send("Không có thông tin của đồng " + src)
@@ -63,4 +65,5 @@ async def on_ready():
   print(f'CryptoBot is ready!')
 
 keep_alive()
+price = Price()
 bot.run(TOKEN)
