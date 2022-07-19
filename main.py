@@ -18,7 +18,7 @@ async def introduce(ctx):
     response = "Chuyên gia đọc lệnh, thần tỉa nến, thánh all in"
     await ctx.send(response)
 
-@bot.command(name='price', help="Get a coin price. !price <symbol> <target currency-optional-default:USD>.\nEx: !price BTC, !price BTC VND")
+@bot.command(name='price', help="Get a coin price. !price <symbol> <target currency-optional-default:VND>.\nEx: !price BTC, !price btc usd")
 async def get_price(ctx, *args):
   if not args:
     response = "Vui lòng nhập ký hiệu đồng tiền và giá đích, !price <symbol> <target currency"
