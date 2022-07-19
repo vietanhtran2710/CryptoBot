@@ -39,15 +39,22 @@ class Price(object):
       return "Đã có lỗi xảy ra, xin vui lòng thử lại sau, " + e
 
   def get_multiple_price(self, src, dst):
+    if src not in self.symbol_to_id.keys():
+      return "Đồng" + src.upper() + "không có trong dữ liệu"
+    if dst not in self.symbol_to_id.keys():
+      return "Đồng" + dst.upper() + "không có trong dữ liệu"
     try:
-      response = self.session.get(self.url)
-      data = json.loads(response.text)
-      src_price, dst_price = None, None
-      for item in data:
-        if item['currency'] == src:
-          src_price = item['price']
-        if item['currency'] == dst:
-          dst_price = item['price']
-      return src_price, dst_price
+      src_id = self.symbol_to_id[src]
+      response = requests.get(self.url + 'simple/price?ids=' + src_id + '&vs_currencies=usd')
+      if response.status_code != 200:
+        return "Đã có lỗi xảy ra, xin vui lòng thử lại sau, code: " + str(response.status_code)
+      src_price = response.json()[src_id]["usd"]
+      dst_id = self.symbol_to_id[dst]
+      response = requests.get(self.url + 'simple/price?ids=' + dst_id + '&vs_currencies=usd')
+      if response.status_code != 200:
+        return "Đã có lỗi xảy ra, xin vui lòng thử lại sau, code: " + str(response.status_code)
+      dst_price = response.json()[dst_id]["usd"]
+      ratio = src_price / dst_price
+      return "1 " + src.upper() + " = " + str(ratio) + " " + dst.upper()
     except (ConnectionError, Timeout, TooManyRedirects) as e:
-      print(e)
+      return "Đã có lỗi xảy ra, xin vui lòng thử lại sau, " + e
